@@ -10,6 +10,11 @@
 
 ## Unreleased
 
+## 1.0.33
+
+- Unlinked cwd: `cm_ambient` / `cm_doctor` return `suggested_shelf` when the folder name matches a shelf id, plus `fix_hints`. Pass that `shelf=` on writes the same turn; optional durable bind via `cm_library {id, sourceDir}`. Guests still must not `centricmem link`.
+
+
 - goose's recipes are installed, not merely shipped. `goose plugin install` copies skills and hooks and
   nothing else - the Agent Plugins manifest has no recipes field and goose's discovery never looks inside
   `~/.agents/plugins/` - so the two recipes in `goose/` were inert from the moment they arrived, and
@@ -122,15 +127,15 @@
 
 ## 1.0.16
 
-- Qwen Code joins the verified list. Its hooks are real - `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PreToolUse`, `Stop` and more, configured in `.qwen/settings.json` - and a `SessionStart` hook adds context by printing `{"hookSpecificOutput": {"additionalContext": ‚Ä¶}}`. `qwen/ambient-hook.mjs` is the same shared ambient implementation the other wrappers use, in Qwen's shape, and the example settings block is in `qwen/settings-hooks.example.json`. It runs in the smoke job on Linux and macOS with the other three.
+- Qwen Code joins the verified list. Its hooks are real - `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PreToolUse`, `Stop` and more, configured in `.qwen/settings.json` - and a `SessionStart` hook adds context by printing `{"hookSpecificOutput": {"additionalContext": Ö}}`. `qwen/ambient-hook.mjs` is the same shared ambient implementation the other wrappers use, in Qwen's shape, and the example settings block is in `qwen/settings-hooks.example.json`. It runs in the smoke job on Linux and macOS with the other three.
 - Devin gets a folder that says what is true and stops there: its CLI has `skills`, `plugins`, `mcp` and `doctor`, but `docs.devin.ai/cli/extensibility/*` renders only navigation without JavaScript, so no manifest is shipped and the install stays `devin mcp` plus the open skills CLI.
-- Cline's row notes the shortcut: `cline skill add ‚Ä¶` forwards to the same open skills CLI, so its Skill install is one command.
+- Cline's row notes the shortcut: `cline skill add Ö` forwards to the same open skills CLI, so its Skill install is one command.
 
 ## 1.0.15
 
 - `cm_health` and `cm_doctor` now say how the caller authenticated: `auth=oauth|bearer|missing` plus `keyFp`, the first 12 hex of the presented key - the same fingerprint the new-network notices already print. A stale environment on the host looked exactly like an unrotated key; the fix is a comparison, not a guess. The contract table keeps the 12 honest.
 - The Skill sends an agent to compare three fingerprints before calling a key unrotated: the card, the process environment, and whether this host is on OAuth at all. That was the wrong turn we took ourselves.
-- The Grok row now names the path that works: `grok.com/connectors` ‚Üí Custom ‚Üí the hosted URL, or the CLI with an explicit `-t http`. Without it Grok declares the server as **stdio** - a server that exists in the config and cannot run - which is what "MCP server does not exist" described.
+- The Grok row now names the path that works: `grok.com/connectors` ? Custom ? the hosted URL, or the CLI with an explicit `-t http`. Without it Grok declares the server as **stdio** - a server that exists in the config and cannot run - which is what "MCP server does not exist" described.
 - REFERENCE gained a host-side checklist for the things only a host can fix (connected-but-not-callable, secrets that never reach the process, stale bridge tokens, per-session MCP resets), and the rule that a localhost OAuth callback cannot be moved to another machine.
 - The `dsh/` pin moved from `#v0.21.72` to the current release: every `v0.21.x` tag points at the same pre-1.0 snapshot, so that funnel was installing a 1.0.6-era copy.
 
@@ -142,12 +147,12 @@
 
 ## 1.0.13
 
-- Hermes is **verified**, not documented. `hermes skills install zeyu-j/centricmem-skill/skills/centricmem-agent --yes` lands the Skill in `%LOCALAPPDATA%\hermes\skills` and `hermes skills list` reports `1 hub-installed`; without `--yes` a non-TTY host cancels it silently. Its shell hooks are verified too, and `hermes/` now carries them with a README: the reply to `pre_llm_call` must be JSON (`{"context": ‚Ä¶}` - a bare string is dropped as `parsed: <none>`), and an entry that is not allowlisted never fires, which `hermes hooks doctor` will say.
+- Hermes is **verified**, not documented. `hermes skills install zeyu-j/centricmem-skill/skills/centricmem-agent --yes` lands the Skill in `%LOCALAPPDATA%\hermes\skills` and `hermes skills list` reports `1 hub-installed`; without `--yes` a non-TTY host cancels it silently. Its shell hooks are verified too, and `hermes/` now carries them with a README: the reply to `pre_llm_call` must be JSON (`{"context": Ö}` - a bare string is dropped as `parsed: <none>`), and an entry that is not allowlisted never fires, which `hermes hooks doctor` will say.
 - Hermes keeps its config where `HERMES_HOME` points - on Windows `%LOCALAPPDATA%\hermes`, not `~/.hermes`. The docs said `~/.hermes/config.yaml`; that file is ignored on Windows, which cost an hour.
 - A private client of ours had been serving 0.21.90 since the day it was installed, with nothing to say so. Refreshed in place to this release with its own plugin tool, and its plan output turned out to be a useful second opinion: it reports which capabilities it maps and warns that it is about to register shell hooks that run during its sessions. It runs the shared `hooks/hooks.json` - `SessionStart` and `SessionEnd` both active - so it needs no folder of its own. Its name stays out of this repository on purpose; the record lives with the private host-ops notes.
 - Cursor and Grok share one row now, the way CodeBuddy Code and WorkBuddy do, because a wrapper that reads the same core does not need its own line.
 - The evidence moved out of the README. `VERIFIED-INSTALLS.md` holds every client we installed into with the command and the answer it gave; `VERIFIED-OPTIMISATIONS.md` holds the hooks, recipes and refreshers built on top. The README keeps the install instructions and points at both.
-- Marks are defined once, and one is new: ‚úÖ verified, ‚óê same core as the CLI (the CLI was verified, this wrapper was not exercised), üìÑ documented. **One core, one test** - a GUI or IDE is not re-tested for the CLI's sake, except for browser and OAuth hops, session-end behaviour, and wrappers that ship their own snapshot of the core.
+- Marks are defined once, and one is new: ? verified, ? same core as the CLI (the CLI was verified, this wrapper was not exercised), ?? documented. **One core, one test** - a GUI or IDE is not re-tested for the CLI's sake, except for browser and OAuth hops, session-end behaviour, and wrappers that ship their own snapshot of the core.
 - The licence history moved to `LICENSE-NOTES.md`: what changed at 1.0.7, what the grant does not reach, and why `dsh/` carries its own. `LICENSE` stays the verbatim MIT text, which is also what tools read.
 - `npm run sync:skill` now exists. The version gate has always said "run the Skill sync" when a bundled copy drifts, and there was no such command - it was done by hand, which is how the copies drifted. It copies the public `SKILL.md` into all four copies and reports the ones it changed.
 - The Skill frontmatter floors now say which numbering they use: they are 0.21.x numbers from the pre-1.0 line, and every 1.0.x satisfies them. They read as if the floors were newer than the current release, which they are not.
@@ -260,15 +265,15 @@
 
 ## 0.21.91
 
-- Skill refresh: install morphologies (hub body / junction reuse / parallel body). Hosts outside that list must discover and remember this client‚Äôs load path and refresh only that tree ‚Äî do not invent a shared hub or unify sibling copies. Librarian CLI unchanged (**0.21.80**).
+- Skill refresh: install morphologies (hub body / junction reuse / parallel body). Hosts outside that list must discover and remember this clientís load path and refresh only that tree ó do not invent a shared hub or unify sibling copies. Librarian CLI unchanged (**0.21.80**).
 
 ## 0.21.90
 
-- Findability: SKILL.md opens with a five-line Do not summary. After a disk refresh, re-read SKILL + Do not before the next write. ¬ß2 and Skill refresh stress load path ‚â† refresh path; optional inventory for sibling copies; the host's install tool often fails a rename while the host is running ‚Äî file-level overwrite still works, then sync plugin-packages.json. cm_search takes q (not query). Librarian CLI unchanged (**0.21.80**).
+- Findability: SKILL.md opens with a five-line Do not summary. After a disk refresh, re-read SKILL + Do not before the next write. ß2 and Skill refresh stress load path ? refresh path; optional inventory for sibling copies; the host's install tool often fails a rename while the host is running ó file-level overwrite still works, then sync plugin-packages.json. cm_search takes q (not query). Librarian CLI unchanged (**0.21.80**).
 
 ## 0.21.89
 
-- Skill refresh: description asks agents to compare the loaded copy vs skill_latest on session start. Plugin-tree hosts prefer the host's install_source tool with the full URL https://github.com/zeyu-j/centricmem-skill (kind plugin; dry-run then apply); read version from the plugin package.json, not ~/.agents. Limits: detect, install, ask human to restart ‚Äî this chat keeps the already-loaded Skill. Librarian CLI unchanged (**0.21.80**).
+- Skill refresh: description asks agents to compare the loaded copy vs skill_latest on session start. Plugin-tree hosts prefer the host's install_source tool with the full URL https://github.com/zeyu-j/centricmem-skill (kind plugin; dry-run then apply); read version from the plugin package.json, not ~/.agents. Limits: detect, install, ask human to restart ó this chat keeps the already-loaded Skill. Librarian CLI unchanged (**0.21.80**).
 
 ## 0.21.88
 
